@@ -1,11 +1,38 @@
-const http = require("http");
+const express = require('express');
+const app = express();
 const port = 8081;
+const bodyParser = require('body-parser');
+const _ = require('lodash');
 
-http.createServer(requestListener).listen(port);
-console.log("Server pocuva na ", port);
+app.listen(port);
+app.use(bodyParser.json());
 
-function requestListener(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    console.log("Request prisiel, odpovedam");
-    res.end("Hello");
-}
+let taskList = [];
+app.get('/list', function (req, res) {
+    res.send(taskList);
+});
+
+app.post('/task', [validationMiddleware, function (req, res) {
+    taskList.push(req.body.task);
+    res.send(taskList);
+}]);
+
+app.put('/task/:task_index', [validationMiddleware, function(req, res){
+    // let taskIndex = req.params.task_index;
+    taskList[req.params.task_index] = req.body.task;
+    res.send(taskList);
+}]);
+
+app.delete('/task/:task_index', function(req, res){
+    taskList.splice(req.params.task_index, 1)
+    res.send(taskList);
+});
+
+function validationMiddleware(req, res, next) {
+    if(_.isEmpty(req.body.task)) {
+        return res.status(422).send("Prisiel prazdny task");
+    }
+    return next();
+};
+
+
