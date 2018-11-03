@@ -1,10 +1,11 @@
 const express = require('express');
 const app = express();
-const port = 8081;
+// const port = 8081;
 const bodyParser = require('body-parser');
 const _ = require('lodash');
+const config = require('config');
 
-app.listen(port);
+app.listen(config.port);
 app.use(bodyParser.json());
 
 let taskList = [];
@@ -24,7 +25,7 @@ app.put('/task/:task_index', [validationMiddleware, function(req, res){
 }]);
 
 app.delete('/task/:task_index', function(req, res){
-    taskList.splice(req.params.task_index, 1)
+    taskList.splice(req.params.task_index, 1);
     res.send(taskList);
 });
 
@@ -33,6 +34,6 @@ function validationMiddleware(req, res, next) {
         return res.status(422).send("Prisiel prazdny task");
     }
     return next();
-};
+}
 
 
